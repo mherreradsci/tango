@@ -15,4 +15,4 @@ def index(request):
 
 def about(request):
     context_dict = {"username": "mherrera"}
-    return render(request, "rango/about.html", context_dict)
+    return render(request, "rango/about.html", context=context_dict)
