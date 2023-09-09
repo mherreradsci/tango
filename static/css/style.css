@@ -1,0 +1,15 @@
+.form_error_message {
+	color: red;
+	font-weight: bold;
+	border: 2px red solid;
+}
+
+.form_required_field {
+	color: royalblue;
+	font-weight: bold;
+}
+
+.helptext {
+	color: gray;
+	font-style: italic;
+}
