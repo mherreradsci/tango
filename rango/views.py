@@ -1,5 +1,8 @@
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 
 from rango.forms import CategoryForm, PageForm, UserForm, UserProfileForm
 from rango.models import Category, Page
@@ -74,6 +77,7 @@ def show_category(request, category_name_slug):
 
 
 # Create View
+@login_required
 def add_category(request):
     form = CategoryForm()
 
@@ -102,7 +106,7 @@ def add_category(request):
 
 # Create View
 
-
+@login_required
 def add_page(request, category_name_slug):
     try:
         category = Category.objects.get(slug=category_name_slug)
@@ -211,9 +215,6 @@ def register(request):
     )
 
 
-from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponse
-
 
 def user_login(request):
     # If the request is a HTTP POST, try to pull out the relevant information.
@@ -261,12 +262,10 @@ def user_login(request):
         return render(request, "rango/login.html")
 
 
-from django.contrib.auth.decorators import login_required
-
 
 @login_required
 def restricted(request):
-    return HttpResponse("Since you're logged in, you can see this text!")
+    return render(request, "rango/restricted.html")
 
 
 # Use the login_required() decorator to ensure only those logged in can
