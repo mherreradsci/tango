@@ -27,6 +27,8 @@ def index(request):
     page_list = Page.objects.order_by("-views")[:5]
     context_dict["pages"] = page_list
 
+    request.session.set_test_cookie()
+
     # Return a rendered response to send to the client.
     # We make use of the shortcut function to make our lives easier.
     # Note that the first parameter is the template we wish to use.
@@ -40,6 +42,10 @@ def about(request):
     print(request.method)
     # prints out the user name, if no one is logged in it prints `AnonymousUser`
     print(request.user)
+
+    if request.session.test_cookie_worked():
+        print("TEST COOKIE WORKED!")
+        request.session.delete_test_cookie()    
 
     return render(request, "rango/about.html", context=context_dict)
 
