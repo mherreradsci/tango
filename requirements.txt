@@ -2,3 +2,4 @@ Django==4.1.1
 djlint==1.34.1
 jsbeautifier==1.14.11
 #pillow==5.4.1
+isort==5.13.2
