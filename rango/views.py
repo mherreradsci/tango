@@ -31,7 +31,7 @@ def index(request):
     context_dict["pages"] = page_list
 
     visitor_cookie_handler(request)
-    context_dict['visits'] = get_server_side_cookie(request, 'visits', 1)
+    context_dict["visits"] = get_server_side_cookie(request, "visits", 1)
 
     # Obtain our Response object early so we can add cookie information.
     response = render(request, "rango/index.html", context=context_dict)
@@ -287,28 +287,30 @@ def user_logout(request):
     # Take the user back to the homepage.
     return redirect(reverse("rango:index"))
 
+
 def get_server_side_cookie(request, cookie, default_val=None):
     val = request.session.get(cookie)
     if not val:
         val = default_val
     return val
 
+
 def visitor_cookie_handler(request):
     # Get the number of visits to the site.
-    visits = int(get_server_side_cookie(request, 'visits', '1'))
-    last_visit_cookie = get_server_side_cookie(request,
-                                                'last_visit', str(datetime.now()))
-    last_visit_time = datetime.strptime(last_visit_cookie[:-7],
-                                        '%Y-%m-%d %H:%M:%S')
+    visits = int(get_server_side_cookie(request, "visits", "1"))
+    last_visit_cookie = get_server_side_cookie(
+        request, "last_visit", str(datetime.now())
+    )
+    last_visit_time = datetime.strptime(last_visit_cookie[:-7], "%Y-%m-%d %H:%M:%S")
 
     # If it's been more than a day since the last visit...
     if (datetime.now() - last_visit_time).seconds > 0:
         visits = visits + 1
         # Update the last visit cookie now that we have updated the count
-        request.session['last_visit'] = str(datetime.now())
+        request.session["last_visit"] = str(datetime.now())
     else:
         # Set the last visit cookie
-        request.session['last_visit'] = last_visit_cookie
-    
+        request.session["last_visit"] = last_visit_cookie
+
     # Update/set the visits cookie
-    request.session['visits'] = visits
+    request.session["visits"] = visits
