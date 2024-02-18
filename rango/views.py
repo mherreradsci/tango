@@ -31,7 +31,7 @@ def index(request):
     context_dict["pages"] = page_list
 
     visitor_cookie_handler(request)
-    context_dict["visits"] = get_server_side_cookie(request, "visits", 1)
+    #context_dict["visits"] = get_server_side_cookie(request, "visits", 1)
 
     # Obtain our Response object early so we can add cookie information.
     response = render(request, "rango/index.html", context=context_dict)
@@ -48,6 +48,8 @@ def about(request):
     # prints out the user name, if no one is logged in it prints `AnonymousUser`
     print(request.user)
 
+    context_dict["visits"] = get_server_side_cookie(request, "visits", 1)
+    
     # if request.session.test_cookie_worked():
     #     print("TEST COOKIE WORKED!")
     #     request.session.delete_test_cookie()
@@ -301,6 +303,8 @@ def visitor_cookie_handler(request):
     last_visit_cookie = get_server_side_cookie(
         request, "last_visit", str(datetime.now())
     )
+    print(f'last_visit_cookie:{last_visit_cookie}' )
+    print(f'last_visit_cookie[:-7]:{last_visit_cookie[:-7]}' )
     last_visit_time = datetime.strptime(last_visit_cookie[:-7], "%Y-%m-%d %H:%M:%S")
 
     # If it's been more than a day since the last visit...
