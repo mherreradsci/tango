@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
@@ -19,6 +21,7 @@ def index(request):
     # Order the categories by the number of likes in descending order.
     # Retrieve the top 5 only -- or all if less than 5.
     category_list = Category.objects.order_by("-likes")[:5]
+
     # Place the list in our context_dict dictionary (with our boldmessage!)
     # that will be passed to the template engine.
     context_dict["categories"] = category_list
@@ -27,10 +30,14 @@ def index(request):
     page_list = Page.objects.order_by("-views")[:5]
     context_dict["pages"] = page_list
 
-    # Return a rendered response to send to the client.
-    # We make use of the shortcut function to make our lives easier.
-    # Note that the first parameter is the template we wish to use.
-    return render(request, "rango/index.html", context=context_dict)
+    visitor_cookie_handler(request)
+    #context_dict["visits"] = get_server_side_cookie(request, "visits", 1)
+
+    # Obtain our Response object early so we can add cookie information.
+    response = render(request, "rango/index.html", context=context_dict)
+
+    # Return response back to the user, updating any cookies that need changed.
+    return response
 
 
 # This view is simple (don't interact with models)
@@ -40,6 +47,12 @@ def about(request):
     print(request.method)
     # prints out the user name, if no one is logged in it prints `AnonymousUser`
     print(request.user)
+
+    context_dict["visits"] = get_server_side_cookie(request, "visits", 1)
+    
+    # if request.session.test_cookie_worked():
+    #     print("TEST COOKIE WORKED!")
+    #     request.session.delete_test_cookie()
 
     return render(request, "rango/about.html", context=context_dict)
 
@@ -105,6 +118,7 @@ def add_category(request):
 
 
 # Create View
+
 
 @login_required
 def add_page(request, category_name_slug):
@@ -215,7 +229,6 @@ def register(request):
     )
 
 
-
 def user_login(request):
     # If the request is a HTTP POST, try to pull out the relevant information.
     if request.method == "POST":
@@ -262,7 +275,6 @@ def user_login(request):
         return render(request, "rango/login.html")
 
 
-
 @login_required
 def restricted(request):
     return render(request, "rango/restricted.html")
@@ -276,3 +288,33 @@ def user_logout(request):
     logout(request)
     # Take the user back to the homepage.
     return redirect(reverse("rango:index"))
+
+
+def get_server_side_cookie(request, cookie, default_val=None):
+    val = request.session.get(cookie)
+    if not val:
+        val = default_val
+    return val
+
+
+def visitor_cookie_handler(request):
+    # Get the number of visits to the site.
+    visits = int(get_server_side_cookie(request, "visits", "1"))
+    last_visit_cookie = get_server_side_cookie(
+        request, "last_visit", str(datetime.now())
+    )
+    print(f'last_visit_cookie:{last_visit_cookie}' )
+    print(f'last_visit_cookie[:-7]:{last_visit_cookie[:-7]}' )
+    last_visit_time = datetime.strptime(last_visit_cookie[:-7], "%Y-%m-%d %H:%M:%S")
+
+    # If it's been more than a day since the last visit...
+    if (datetime.now() - last_visit_time).seconds > 0:
+        visits = visits + 1
+        # Update the last visit cookie now that we have updated the count
+        request.session["last_visit"] = str(datetime.now())
+    else:
+        # Set the last visit cookie
+        request.session["last_visit"] = last_visit_cookie
+
+    # Update/set the visits cookie
+    request.session["visits"] = visits
