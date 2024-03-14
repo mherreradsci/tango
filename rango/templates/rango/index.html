@@ -2,17 +2,17 @@
 {% load static %}
 {% block title_block %}Homepage{% endblock %}
 {% block body_block %}
-    <div>
-        <h1>Rango says...</h1>
-        <div>
-            {% if user.is_authenticated %}
-                howdy {{ user.username }}!
-            {% else %}
-                hey there partner!
-            {% endif %}
-            <br />
+    <div class="container-fluid py-1">
+        <div class="row bg-light rounded-3">
+            <h1 class="display-5 fw-bold">Rango says...</h1>
+            <p class="col-md-8 fs-4">
+                {% if user.is_authenticated %}
+                    howdy {{ user.username }}!
+                {% else %}
+                    hey there partner!
+                {% endif %}
+            </p>
             <strong>{{ aboldmessage }}</strong>
-            <br />
         </div>
         <div>
             <!-- Categories -->
